@@ -4,6 +4,7 @@ import pygame
 
 # 导入模块sys 和pygame 。模块pygame 包含开发游戏所需的功能。玩家退
 # 出时，我们将使用模块sys 中的工具来退出游戏。
+from settings import Settings
 
 
 class AlienInvasion:
@@ -11,8 +12,10 @@ class AlienInvasion:
     def __init__(self):
         """初始化游戏并创建游戏资源。"""
         pygame.init()
+        self.settings = Settings()
 
-        self.screen = pygame.display.set_mode((1200, 800))
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien Invasion")
         # 在这个类的方法__init__() 中，调用函数pygame.init() 来初始化背景设
         # 置，让Pygame能够正确地工作
@@ -27,6 +30,9 @@ class AlienInvasion:
         # surface。display.set_mode() 返回的surface表示整个游戏窗口。激活游戏的
         # 动画循环后，每经过一次循环都将自动重绘这个surface，将用户输入触发的所有变化都反映出来。
 
+        # # 设置背景色
+        # self.bg_color = ((230, 230, 230))
+
     def run_game(self):
         """开始游戏的主循环"""
         while True:
@@ -34,6 +40,10 @@ class AlienInvasion:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+
+            # 每次循环时都重绘屏幕。
+            self.screen.fill(self.settings.bg_color)
+
             # 让最近绘制的屏幕可见。
             pygame.display.flip()
     # 这个游戏由方法run_game() 控制。该方法包含一个不断运行的while 循环
@@ -62,3 +72,14 @@ if __name__ == '__main__':
 # 在这个文件末尾，创建一个游戏实例并调用run_game() 。这些代码放在一个if
 # 代码块中，仅当直接运行该文件时，它们才会执行。如果此时运行
 # alien_invasion.py，将看到一个空的Pygame窗口。
+
+# 设置背景色
+# Pygame默认创建一个黑色屏幕，这太乏味了。下面来将背景设置为另一种颜色，这
+# 是在方法__init__() 末尾进行的
+
+# 在Pygame中，颜色是以RGB值指定的。这种颜色由红色、绿色和蓝色值组成，其中每
+# 个值的可能取值范围都是0～255。颜色值(255, 0, 0)表示红色，(0, 255, 0)表示
+# 绿色，而(0, 0, 255)表示蓝色。通过组合不同的RGB值，可创建1600万种颜色。在
+# 颜色值(230, 230, 230)中，红色、绿色和蓝色的量相同，它生成一种浅灰色。我们
+# 将这种颜色赋给了self.bg_color
+# 调用方法fill() 用这种背景色填充屏幕。方法fill() 用于处理surface，只接受一个实参：一种颜色。

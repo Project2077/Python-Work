@@ -30,6 +30,7 @@ class Ship:
     def __init__(self, ai_game):
         """初始化飞船并设置其初始位置。"""
         self.screen = ai_game.screen
+        self.settings = ai_game.settings
         self.screen_rect = ai_game.screen.get_rect()
 
         # 加载飞船图像并获取其外接矩形。
@@ -38,6 +39,30 @@ class Ship:
 
         # 对于每艘新飞船，都将其放在屏幕底部的中央。
         self.rect.midbottom = self.screen_rect.midbottom
+
+        # 在飞船的属性x中存储小数值。
+        self.x = float(self.rect.x)
+        # 通过将速度设置指定为小数值，可在后面加快游戏节奏时更细致地控制飞船的速
+        # 度。然而，rect 的x 等属性只能存储整数值，因此需要对Ship 类做些修改
+
+        # 移动标志
+        self.moving_right = False
+        self.moving_left = False
+
+    # 方法update() 将通过Ship 实例来调用，因此不是辅助方法。
+    # 限制飞船的活动范围
+    # 在修改self.x 的值之前检查飞船的位置。self.rect.right 返回飞船
+    # 外接矩形右边缘的 坐标。如果这个值小于self.screen_rect.right 的值，就说明飞船未触及屏幕右边缘
+    # 左边缘的情况与此类似：如果rect 左边缘的坐标大于零，就说明飞船未触及屏幕左边缘
+    def update(self):
+        """根据移动标志调整飞船的位置。"""
+        if self.moving_right and self.rect.right < self.screen_rect.right:
+            self.x += self.settings.ship_speed
+        if self.moving_left and self.rect.left > 0:
+            self.x -= self.settings.ship_speed
+
+        # 根据self.x更新rect对象。
+        self.rect.x = self.x
 
     def blitme(self):
         """在指定位置绘制飞船。"""

@@ -17,3 +17,8 @@ class Settings:
         self.screen_height = 800
         self.bg_color = (230, 230, 230)
         # 之后修改alien_invasion.py的init
+
+        # 调整飞船的速度
+        # 飞船设置
+        self.ship_speed = 1.5
+

@@ -11,6 +11,7 @@ from ship import Ship
 
 class AlienInvasion:
     """管理游戏资源和行为的类"""
+
     def __init__(self):
         """初始化游戏并创建游戏资源。"""
         pygame.init()
@@ -18,6 +19,11 @@ class AlienInvasion:
 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
+        # 全屏
+        # self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        # self.settings.screen_width = self.screen.get_rect().width
+        # self.settings.screen_height = self.screen.get_rect().height
+
         pygame.display.set_caption("Alien Invasion")
         # 在这个类的方法__init__() 中，调用函数pygame.init() 来初始化背景设
         # 置，让Pygame能够正确地工作
@@ -42,11 +48,16 @@ class AlienInvasion:
             # 监视键盘和鼠标事件。
             self._check_events()
 
+            # 飞船的位置将在检测到键盘事件后（但在更新屏幕前）更新。这样，玩家输入时，
+            # 飞船的位置将更新，从而确保使用更新后的位置将飞船绘制到屏幕上。
+            self.ship.update()
+
             # 每次循环时都重绘屏幕。
             self._update_screen()
 
             # 让最近绘制的屏幕可见。
             pygame.display.flip()
+
     # 这个游戏由方法run_game() 控制。该方法包含一个不断运行的while 循环
     # 而这个循环包含一个事件循环以及管理屏幕更新的代码。
     # 事件 是用户玩游戏时执行的操作，如按键或移动鼠标。为程序响应事件，可编写一个事件循环 ，以侦
@@ -69,11 +80,60 @@ class AlienInvasion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+                # 修改游戏在玩家按下右箭头键时响应的方式：不直接调整飞船的位置，而只
+                # 是将moving_right 设置为True 。
+
+    # 重构_check_events()
+    # 随着游戏的开发，方法_check_events() 将越来越长。因此将其部分代码放在两
+    # 个方法中，其中一个处理KEYDOWN 事件，另一个处理KEYUP 事件
+    def _check_keydown_events(self, event):
+        """响应按键。"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()
+        # 按Q键退出
+
+
+    def _check_keyup_events(self, event):
+        """响应松开。"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
 
     def _update_screen(self):
         """更新屏幕上的图像，并切换到新屏幕。"""
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
+
+    # 驾驶飞船
+    # 下面来让玩家能够左右移动飞船。我们将编写代码，在用户按左或右箭头键时做出
+    # 响应。我们将首先专注于向右移动，再使用同样的原理来控制向左移动。通过这样
+    # 做，你将学会如何控制屏幕图像的移动。
+
+    #  响应按键
+    # 每当用户按键时，都将在Pygame中注册一个事件。事件都是通过方法
+    # pygame.event.get() 获取的，因此需要在方法_check_events() 中指定要检
+    # 查哪些类型的事件。每次按键都被注册为一个KEYDOWN 事件。
+    # Pygame检测到KEYDOWN 事件时，需要检查按下的是否是触发行动的键。例如，如果
+    # 玩家按下的是右箭头键，就增大飞船的rect.centerx 值，将飞船向右移动
+
+    # 允许持续移动
+    # 玩家按住右箭头键不放时，我们希望飞船不断向右移动，直到玩家松开为止。我们
+    # 将让游戏检测pygame.KEYUP 事件，以便知道玩家何时松开右箭头键。然后，结合
+    # 使用KEYDOWN 和KEYUP 事件以及一个名为moving_right 的标志来实现持续移动。
+    # 当标志moving_right 为False 时，飞船不会移动。玩家按下右箭头键时，我们
+    # 将该标志设置为True ，在玩家松开时将该标志重新设置为False 。
+    # 飞船的属性都由Ship 类控制，因此要给这个类添加一个名为moving_right 的属
+    # 性和一个名为update() 的方法。方法update() 检查标志moving_right 的状
+    # 态。如果该标志为True ，就调整飞船的位置。我们将在while 循环中调用这个方法，以调整飞船的位置。  向左同向→
 
 
 if __name__ == '__main__':
@@ -113,3 +173,5 @@ if __name__ == '__main__':
 # 如果你从未开发过这样的项目，可能不知道如何组织代码。这里采用的做法是，先
 # 编写可行的代码，等代码越来越复杂时再进行重构，以向你展示真正的开发过程：
 # 先编写尽可能简单的代码，等项目越来越复杂后对其进行重构。  对代码进行重构使其更容易扩展后，可以开始处理游戏的动态方面了！
+
+
